@@ -17,9 +17,9 @@ const branchNames = [
 const baseBranch = 'develop';
 
 // // Optionally provide folder names (customize per challenge if needed)
-// const components = ['header', 'footer', 'button'];
-// const models = ['user', 'product'];
-// const services = ['auth', 'data'];
+const components = [];
+const models = [];
+const services = [];
 
 function createBranchWithFolders(baseBranch, branchName, components = [], models = [], services = []) {
   try {

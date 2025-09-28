@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
-
-// List of challenge branch names (copy-paste from your image)
+const fetch = require('node-fetch'); // Use only if your Node version doesn't support global fetch
+const challengesEndpoint = 'https://api.github.com/repositories/1014427702/contents/projects/coding-challenges/src/app/challenges';
 const branchNames = [
   'challenge-01-product-list',
   // 'challenge-02-parallel-apis',
@@ -13,16 +13,38 @@ const branchNames = [
   // 'challenge-08-ecommerce-checkout'
 ];
 
-// Provide your main branch name
+// Challenges with file names remain the same
+const challenges = {
+  'challenge-01-product-list': {
+    components: ['product-list.component.ts'],
+    models: ['product.model.ts'],
+    services: ['product.service.ts'],
+    requirementUrl: `${challengesEndpoint}/challenge-01-product-list/docs/CH-01-REQUIREMENT.md`
+  },
+
+  // 'challenge-02-parallel-apis': {
+  //   components: ['user-list.component.ts', 'post-list.component.ts'],
+  //   models: ['user.model.ts', 'post.model.ts'],
+  //   services: ['user.service.ts', 'post.service.ts'],
+  //   requirementUrl: `${challengesEndpoint}/challenge-02-parallel-apis/docs/CH-02-REQUIREMENT.md`
+  // }
+  // Add more challenge entries here with requirementUrl
+};
+
 const baseBranch = 'develop';
 
-// // Optionally provide folder names (customize per challenge if needed)
-const components = [];
-const models = [];
-const services = [];
+async function getRequirementContent(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to fetch requirement from ${url}`);
+  const json = await response.json();
+  // GitHub API returns content base64 encoded
+  const buff = Buffer.from(json.content, 'base64');
+  return buff.toString('utf-8');
+}
 
-function createBranchWithFolders(baseBranch, branchName, components = [], models = [], services = []) {
+async function createBranchWithFolders(baseBranch, branchName, components = [], models = [], services = [], requirementUrl = '') {
   try {
+    // Switch branch commands remain synchronous
     execSync(`git checkout ${baseBranch}`, { stdio: 'inherit' });
     execSync(`git checkout -b ${branchName}`, { stdio: 'inherit' });
 
@@ -30,8 +52,6 @@ function createBranchWithFolders(baseBranch, branchName, components = [], models
     fs.mkdirSync(`${basePath}/components`, { recursive: true });
     fs.mkdirSync(`${basePath}/models`, { recursive: true });
     fs.mkdirSync(`${basePath}/services`, { recursive: true });
-    fs.mkdirSync(`${basePath}/requirements`, { recursive: true });
-
     fs.mkdirSync('src/app/shared', { recursive: true });
 
     components.forEach(name => {
@@ -44,13 +64,19 @@ function createBranchWithFolders(baseBranch, branchName, components = [], models
       fs.mkdirSync(`${basePath}/services/${name}`, { recursive: true });
     });
 
-    // Add README files so folders are tracked by git
-    fs.writeFileSync(`${basePath}/requirements/REQUIREMENTS.md`, `# Requirements for ${branchName}`);
+    // Fetch requirements content from URL and write to file
+    let requirementsContent = '# Default Requirements\n';
+    if (requirementUrl) {
+      requirementsContent = await getRequirementContent(requirementUrl);
+    }
+    fs.writeFileSync(`${basePath}/REQUIREMENTS.md`, requirementsContent);
 
+    // Placeholder for approach file
+    fs.writeFileSync(`${basePath}/MY_APPROACH.md`, `# Approach for ${branchName}`);
 
     execSync('git add .', { stdio: 'inherit' });
-    execSync(`git commit -m "Add folders for ${branchName}"`, { stdio: 'inherit' });
-    execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
+    execSync(`git commit -m "Add folders and requirements for ${branchName}"`, { stdio: 'inherit' });
+    // execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
 
     console.log(`Branch ${branchName} created and pushed.`);
   } catch (error) {
@@ -58,7 +84,9 @@ function createBranchWithFolders(baseBranch, branchName, components = [], models
   }
 }
 
-// Loop through your challenge branch names and create everything
-branchNames.forEach(branchName => {
-  createBranchWithFolders(baseBranch, branchName, components, models, services);
-});
+(async () => {
+  for (const branchName in challenges) {
+    const { components, models, services, requirementUrl } = challenges[branchName];
+    await createBranchWithFolders(baseBranch, branchName, components, models, services, requirementUrl);
+  }
+})();

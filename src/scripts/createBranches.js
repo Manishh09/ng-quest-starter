@@ -1,6 +1,13 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
 const challengesEndpoint = 'https://api.github.com/repositories/1014427702/contents/projects/coding-challenges/src/app/challenges';
+
+const execOptions = {
+  stdio: 'inherit',
+  cwd: angularProjectRoot,
+  env: {...process.env, NG_CLI_ANALYTICS: 'ci'} // disables analytics prompt
+};
+
 const branchNames = [
   'challenge-01-product-list',
   // 'challenge-02-parallel-apis',
@@ -50,16 +57,9 @@ function generateAngularArtifact(type, name, relativePath) {
     // --skip-tests to avoid spec files, remove if tests needed
 
     if (['component', 'service'].includes(type)) {
-      execSync(`ng generate ${type} ${name} --path=${relativePath} --skip-tests`, {
-        stdio: 'inherit',
-        cwd: angularProjectRoot
-      });
-    }
-    else {
-      execSync(`ng generate ${type} ${name} --path=${relativePath}`, {
-        stdio: 'inherit',
-        cwd: angularProjectRoot
-      });
+      execSync(`ng generate ${type} ${name} --path=${relativePath} --skip-tests`, execOptions);
+    } else {
+      execSync(`ng generate ${type} ${name} --path=${relativePath}`, execOptions);  // models don't have --skip-tests
     }
     console.log(`${type} '${name}' generated at '${relativePath}'`);
   } catch (error) {

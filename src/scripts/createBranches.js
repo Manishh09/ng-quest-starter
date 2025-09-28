@@ -15,9 +15,9 @@ const branchNames = [
 // Challenges with file names remain the same
 const challenges = {
   'challenge-01-product-list': {
-    components: ['product-list.component.ts'],
-    models: ['product.model.ts'],
-    services: ['product.service.ts'],
+    components: ['product-list'],
+    models: ['product'],
+    services: ['product'],
     requirementUrl: `${challengesEndpoint}/challenge-01-product-list/docs/CH-01-REQUIREMENT.md`
   },
 
@@ -48,7 +48,7 @@ function generateAngularArtifact(type, name, relativePath) {
   try {
     // ng g c componentName --path=relativePath
     // --skip-tests to avoid spec files, remove if tests needed
-    execSync(`ng generate ${type} ${name} --skip-tests --path=${relativePath}`, {
+    execSync(`ng generate ${type} ${name} --path=${relativePath}`, {
       stdio: 'inherit',
       cwd: angularProjectRoot
     });
@@ -67,7 +67,9 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
     const basePath = `src/app/${branchName}`;
 
     // Create base folders and shared folder
-    fs.mkdirSync(basePath, { recursive: true });
+    // fs.mkdirSync(`${basePath}/components`, { recursive: true });
+    // fs.mkdirSync(`${basePath}/models`, { recursive: true });
+    // fs.mkdirSync(`${basePath}/services`, { recursive: true });
     fs.mkdirSync('src/app/shared', { recursive: true });
 
     // Fetch requirements content and write to file
@@ -99,7 +101,7 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
 
     // Stage all changes
     execSync('git add .', { stdio: 'inherit' });
-    execSync(`git commit -m "Add folders, requirements, and generate Angular artifacts for ${branchName}"`, { stdio: 'inherit' });
+    //execSync(`git commit -m "Add folders, requirements, and generate Angular artifacts for ${branchName}"`, { stdio: 'inherit' });
     //execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
 
     console.log(`Branch ${branchName} created, artifacts generated, and pushed successfully.`);

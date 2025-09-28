@@ -31,58 +31,84 @@ const challenges = {
 };
 
 const baseBranch = 'develop';
+const angularProjectRoot = '.'; // Change if your ng project root is different
 
+// Helper: fetch and decode base64 requirements content from GitHub API
 async function getRequirementContent(url) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Failed to fetch requirement from ${url}`);
   const json = await response.json();
-  // GitHub API returns content base64 encoded
+  if (!json.content) throw new Error('API response missing content field');
   const buff = Buffer.from(json.content, 'base64');
   return buff.toString('utf-8');
 }
 
+// Helper: generate Angular artifact using CLI
+function generateAngularArtifact(type, name, relativePath) {
+  try {
+    // ng g c componentName --path=relativePath
+    // --skip-tests to avoid spec files, remove if tests needed
+    execSync(`ng generate ${type} ${name} --skip-tests --path=${relativePath}`, {
+      stdio: 'inherit',
+      cwd: angularProjectRoot
+    });
+    console.log(`${type} '${name}' generated at '${relativePath}'`);
+  } catch (error) {
+    console.error(`Error generating ${type} '${name}':`, error.message);
+  }
+}
+
 async function createBranchWithFolders(baseBranch, branchName, components = [], models = [], services = [], requirementUrl = '') {
   try {
-    // Switch branch commands remain synchronous
+    // Checkout base branch and create new branch
     execSync(`git checkout ${baseBranch}`, { stdio: 'inherit' });
     execSync(`git checkout -b ${branchName}`, { stdio: 'inherit' });
 
     const basePath = `src/app/${branchName}`;
-    fs.mkdirSync(`${basePath}/components`, { recursive: true });
-    fs.mkdirSync(`${basePath}/models`, { recursive: true });
-    fs.mkdirSync(`${basePath}/services`, { recursive: true });
+
+    // Create base folders and shared folder
+    fs.mkdirSync(basePath, { recursive: true });
     fs.mkdirSync('src/app/shared', { recursive: true });
 
-    components.forEach(name => {
-      fs.writeFileSync(`${basePath}/components/${name}`, { recursive: true });
-    });
-    models.forEach(name => {
-      fs.writeFileSync(`${basePath}/models/${name}`, { recursive: true });
-    });
-    services.forEach(name => {
-      fs.writeFileSync(`${basePath}/services/${name}`, { recursive: true });
-    });
-
-    // Fetch requirements content from URL and write to file
-    let requirementsContent = '# Default Requirements\n';
+    // Fetch requirements content and write to file
+    let requirementsContent = '# Default Requirements\nNo content available.';
     if (requirementUrl) {
       requirementsContent = await getRequirementContent(requirementUrl);
     }
     fs.writeFileSync(`${basePath}/REQUIREMENTS.md`, requirementsContent);
 
-    // Placeholder for approach file
+    // Placeholder MY_APPROACH file
     fs.writeFileSync(`${basePath}/MY_APPROACH.md`, `# Approach for ${branchName}`);
 
-    execSync('git add .', { stdio: 'inherit' });
-    execSync(`git commit -m "Add folders and requirements for ${branchName}"`, { stdio: 'inherit' });
-    // execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
+    // Generate Angular components, models, services under their respective folders
+    if (components.length) {
+      components.forEach(name => {
+        generateAngularArtifact('component', name, `${basePath}/components`);
+      });
+    }
+    if (models.length) {
+      models.forEach(name => {
+        generateAngularArtifact('interface', name, `${basePath}/models`); // Angular CLI uses 'interface' for models
+      });
+    }
+    if (services.length) {
+      services.forEach(name => {
+        generateAngularArtifact('service', name, `${basePath}/services`);
+      });
+    }
 
-    console.log(`Branch ${branchName} created and pushed.`);
+    // Stage all changes
+    execSync('git add .', { stdio: 'inherit' });
+    execSync(`git commit -m "Add folders, requirements, and generate Angular artifacts for ${branchName}"`, { stdio: 'inherit' });
+    //execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
+
+    console.log(`Branch ${branchName} created, artifacts generated, and pushed successfully.`);
   } catch (error) {
-    console.error(`Error creating branch ${branchName}:`, error.message);
+    console.error(`Error on branch ${branchName}:`, error.message);
   }
 }
 
+// Run for all challenges sequentially
 (async () => {
   for (const branchName in challenges) {
     const { components, models, services, requirementUrl } = challenges[branchName];

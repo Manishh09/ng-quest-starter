@@ -34,15 +34,15 @@ function createBranchWithFolders(baseBranch, branchName, components = [], models
 
     fs.mkdirSync('src/app/shared', { recursive: true });
 
-    // components.forEach(name => {
-    //   fs.mkdirSync(`${basePath}/components/${name}`, { recursive: true });
-    // });
-    // models.forEach(name => {
-    //   fs.mkdirSync(`${basePath}/models/${name}`, { recursive: true });
-    // });
-    // services.forEach(name => {
-    //   fs.mkdirSync(`${basePath}/services/${name}`, { recursive: true });
-    // });
+    components.forEach(name => {
+      fs.mkdirSync(`${basePath}/components/${name}`, { recursive: true });
+    });
+    models.forEach(name => {
+      fs.mkdirSync(`${basePath}/models/${name}`, { recursive: true });
+    });
+    services.forEach(name => {
+      fs.mkdirSync(`${basePath}/services/${name}`, { recursive: true });
+    });
 
     // Add README files so folders are tracked by git
     fs.writeFileSync(`${basePath}/requirements/REQUIREMENTS.md`, `# Requirements for ${branchName}`);

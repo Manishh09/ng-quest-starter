@@ -54,13 +54,13 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
     fs.mkdirSync('src/app/shared', { recursive: true });
 
     components.forEach(name => {
-      fs.mkdirSync(`${basePath}/components/${name}`, { recursive: true });
+      fs.writeFileSync(`${basePath}/components/${name}`, { recursive: true });
     });
     models.forEach(name => {
-      fs.mkdirSync(`${basePath}/models/${name}`, { recursive: true });
+      fs.writeFileSync(`${basePath}/models/${name}`, { recursive: true });
     });
     services.forEach(name => {
-      fs.mkdirSync(`${basePath}/services/${name}`, { recursive: true });
+      fs.writeFileSync(`${basePath}/services/${name}`, { recursive: true });
     });
 
     // Fetch requirements content from URL and write to file

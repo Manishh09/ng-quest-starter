@@ -1,6 +1,5 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
-const fetch = require('node-fetch'); // Use only if your Node version doesn't support global fetch
 const challengesEndpoint = 'https://api.github.com/repositories/1014427702/contents/projects/coding-challenges/src/app/challenges';
 const branchNames = [
   'challenge-01-product-list',

@@ -48,10 +48,19 @@ function generateAngularArtifact(type, name, relativePath) {
   try {
     // ng g c componentName --path=relativePath
     // --skip-tests to avoid spec files, remove if tests needed
-    execSync(`ng generate ${type} ${name} --path=${relativePath}`, {
-      stdio: 'inherit',
-      cwd: angularProjectRoot
-    });
+
+    if (['component', 'service'].includes(type)) {
+      execSync(`ng generate ${type} ${name} --path=${relativePath} --skip-tests`, {
+        stdio: 'inherit',
+        cwd: angularProjectRoot
+      });
+    }
+    else {
+      execSync(`ng generate ${type} ${name} --path=${relativePath}`, {
+        stdio: 'inherit',
+        cwd: angularProjectRoot
+      });
+    }
     console.log(`${type} '${name}' generated at '${relativePath}'`);
   } catch (error) {
     console.error(`Error generating ${type} '${name}':`, error.message);
@@ -80,7 +89,9 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
     fs.writeFileSync(`${basePath}/REQUIREMENTS.md`, requirementsContent);
 
     // Placeholder MY_APPROACH file
-    fs.writeFileSync(`${basePath}/MY_APPROACH.md`, `# Approach for ${branchName}`);
+    const approachContent = `# My Approach\nDescribe your approach here. \n # Approach for ${branchName}\n # Why Write Your Approach First?\n
+Writing down your approach before you start coding helps you clarify your thoughts, plan your solution, and catch potential issues early. It's a crucial step that increases your problem-solving effectiveness and code quality.`;
+    fs.writeFileSync(`${basePath}/MY_APPROACH.md`, approachContent);
 
     // Generate Angular components, models, services under their respective folders
     if (components.length) {
@@ -101,10 +112,16 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
 
     // Stage all changes
     execSync('git add .', { stdio: 'inherit' });
-    //execSync(`git commit -m "Add folders, requirements, and generate Angular artifacts for ${branchName}"`, { stdio: 'inherit' });
-    //execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
+    // Commit changes
+    execSync(`git commit -m "Add challenge sample folders, requirements, and generate Angular artifacts for ${branchName}"`, { stdio: 'inherit' });
 
-    console.log(`Branch ${branchName} created, artifacts generated, and pushed successfully.`);
+    // Push branch to remote
+    // Delay to ensure commit is registered before push
+    setTimeout(() => {
+      execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
+
+      console.log(`Branch ${branchName} created, artifacts generated, and pushed successfully.`);
+    }, 1500);
   } catch (error) {
     console.error(`Error on branch ${branchName}:`, error.message);
   }

@@ -2,6 +2,7 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 const challengesEndpoint = 'https://api.github.com/repositories/1014427702/contents/projects/coding-challenges/src/app/challenges';
 
+const angularProjectRoot = '.'; // Change if your ng project root is different
 const execOptions = {
   stdio: 'inherit',
   cwd: angularProjectRoot,
@@ -38,7 +39,6 @@ const challenges = {
 };
 
 const baseBranch = 'develop';
-const angularProjectRoot = '.'; // Change if your ng project root is different
 
 // Helper: fetch and decode base64 requirements content from GitHub API
 async function getRequirementContent(url) {

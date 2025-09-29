@@ -85,8 +85,8 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
     let requirementsContent = '# Default Requirements\nNo content available.';
     if (requirementUrl) {
       requirementsContent = await getRequirementContent(requirementUrl);
+      fs.writeFileSync(`${basePath}/REQUIREMENTS.md`, requirementsContent);
     }
-    fs.writeFileSync(`${basePath}/REQUIREMENTS.md`, requirementsContent);
 
     // Placeholder MY_APPROACH file
     const approachContent = `# My Approach\nDescribe your approach here. \n # Approach for ${branchName}\n # Why Write Your Approach First?\n

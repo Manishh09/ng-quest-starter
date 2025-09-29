@@ -13,52 +13,63 @@ const branches = [
   'challenge-08-ecommerce-checkout'
 ];
 
-const angularRoot = '.'; // Change if your Angular project root is different
+const angularRoot = '.'; // Angular project root
 
 (async () => {
   for (const branch of branches) {
     try {
       console.log(`\n🔄 Processing branch: ${branch}`);
 
-      // Checkout the branch
+      // Checkout branch
       execSync(`git checkout ${branch}`, { stdio: 'inherit' });
 
-      const oldPath = path.join(angularRoot, `src/app/${branch}/REQUIREMENTS.md`);
+      const oldPath = path.join(angularRoot, `src/app/${branch}`);
       const newDir = path.join(angularRoot, 'src/docs');
-      const newPath = path.join(newDir, `CH-${branch.split('-')[1].padStart(2, '0')}-REQUIREMENT.md`);
 
-      // Create src/docs if it doesn't exist
+      // Ensure src/docs exists
       if (!fs.existsSync(newDir)) {
         fs.mkdirSync(newDir, { recursive: true });
       }
 
-      // Move file if it exists
-      if (fs.existsSync(oldPath)) {
-        fs.renameSync(oldPath, newPath);
-        console.log(`✅ Moved ${oldPath} → ${newPath}`);
-      } else {
-        console.warn(`⚠️ File not found: ${oldPath}`);
-      }
+      // List of files to move
+      const filesToMove = ['REQUIREMENTS.md', 'MY_APPROACH.md'];
 
-      // Stage changes
-      execSync(`git add ${newPath}`, { stdio: 'inherit' });
+      filesToMove.forEach(file => {
+        const oldFilePath = path.join(oldPath, file);
+        const newFilePath = path.join(newDir, `${file}`);
+
+        if (fs.existsSync(oldFilePath)) {
+          if (!fs.existsSync(newFilePath)) {
+            fs.renameSync(oldFilePath, newFilePath); // Moves the file (deletes at old, appears at new)
+            console.log(`✅ Moved ${oldFilePath} → ${newFilePath}`);
+          } else {
+            console.warn(`⚠️ Destination file already exists: ${newFilePath}. Skipped moving.`);
+          }
+        } else {
+          console.warn(`⚠️ File not found at source: ${oldFilePath}`);
+        }
+      });
+
+      // Stage all changes (both deletions and additions)
+      execSync(`git add -A`, { stdio: 'inherit' });
 
       // Commit changes
-      execSync(`git commit -m "Move REQUIREMENTS.md for ${branch} to src/docs"`, { stdio: 'inherit' });
+      execSync(`git commit -m "Move requirement and approach files for ${branch} to src/docs"`, { stdio: 'inherit' });
 
-      // Push the branch
+      // Push to remote branch
       execSync(`git push origin ${branch}`, { stdio: 'inherit' });
 
-      // Optional delay for visibility
+      // Optional delay
       await new Promise(res => setTimeout(res, 3000));
 
-      console.log(`🚀 Pushed branch: ${branch}`);
+      console.log(`🚀 Branch ${branch} updated and pushed.`);
 
     } catch (err) {
       console.error(`❌ Error processing branch ${branch}:`, err.message);
     }
   }
 
-  console.log('\n✅ All challenge requirement files moved and pushed successfully!');
+  console.log('\n✅ All challenge files moved and pushed successfully!');
 })();
+
 // Usage: node src/scripts/moveReqFiletoRootDir.js

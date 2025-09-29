@@ -53,20 +53,31 @@ async function getRequirementContent(url) {
 // Helper: generate Angular artifact using CLI
 function generateAngularArtifact(type, name, relativePath) {
   try {
-    // ng g c componentName --path=relativePath
-    // --skip-tests to avoid spec files, remove if tests needed
+    let command = '';
 
-    if (['component', 'service'].includes(type)) {
-      execSync(`ng generate ${type} ${name} --path=${relativePath} --skip-tests`, execOptions);
-    } else {
-      execSync(`ng generate ${type} ${name} --path=${relativePath}`, execOptions);  // models don't have --skip-tests
+    if (type === 'component') {
+      // Angular CLI auto adds .component suffix
+      command = `ng generate component ${name} --path=${relativePath} --skip-tests`;
     }
+    else if (type === 'service') {
+      // Angular CLI auto adds .service suffix
+      command = `ng generate service ${name} --path=${relativePath} --skip-tests`;
+    }
+    else if (type === 'interface') {
+      // Always enforce .model suffix for models
+      const modelName = name.endsWith('.model') ? name : `${name}.model`;
+      command = `ng generate interface ${modelName} --path=${relativePath}`;
+    }
+
+    execSync(command, execOptions);
     console.log(`${type} '${name}' generated at '${relativePath}'`);
   } catch (error) {
     console.error(`Error generating ${type} '${name}':`, error.message);
   }
 }
 
+
+// Main: create branch, generate files, add requirement
 async function createBranchWithFolders(baseBranch, branchName, components = [], models = [], services = [], requirementUrl = '') {
   try {
     // Checkout base branch and create new branch
@@ -75,22 +86,24 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
 
     const basePath = `src/app/${branchName}`;
 
-    // Create base folders and shared folder
-    // fs.mkdirSync(`${basePath}/components`, { recursive: true });
-    // fs.mkdirSync(`${basePath}/models`, { recursive: true });
-    // fs.mkdirSync(`${basePath}/services`, { recursive: true });
+    // ✅ Create base challenge folder + subfolders
+    fs.mkdirSync(basePath, { recursive: true });
+    fs.mkdirSync(`${basePath}/components`, { recursive: true });
+    fs.mkdirSync(`${basePath}/models`, { recursive: true });
+    fs.mkdirSync(`${basePath}/services`, { recursive: true });
+
+    // ✅ Ensure shared folder exists globally
     fs.mkdirSync('src/app/shared', { recursive: true });
 
     // Fetch requirements content and write to file
     let requirementsContent = '# Default Requirements\nNo content available.';
     if (requirementUrl) {
       requirementsContent = await getRequirementContent(requirementUrl);
-      fs.writeFileSync(`${basePath}/REQUIREMENTS.md`, requirementsContent);
     }
+    fs.writeFileSync(`${basePath}/REQUIREMENTS.md`, requirementsContent);
 
     // Placeholder MY_APPROACH file
-    const approachContent = `# My Approach\nDescribe your approach here. \n # Approach for ${branchName}\n # Why Write Your Approach First?\n
-Writing down your approach before you start coding helps you clarify your thoughts, plan your solution, and catch potential issues early. It's a crucial step that increases your problem-solving effectiveness and code quality.`;
+    const approachContent = `# My Approach\nDescribe your approach here.\n\n# Approach for ${branchName}\n\n# Why Write Your Approach First?\nWriting down your approach before you start coding helps you clarify your thoughts, plan your solution, and catch potential issues early. It's a crucial step that increases your problem-solving effectiveness and code quality.`;
     fs.writeFileSync(`${basePath}/MY_APPROACH.md`, approachContent);
 
     // Generate Angular components, models, services under their respective folders
@@ -101,7 +114,7 @@ Writing down your approach before you start coding helps you clarify your though
     }
     if (models.length) {
       models.forEach(name => {
-        generateAngularArtifact('interface', `${name}.model`, `${basePath}/models`); // Angular CLI uses 'interface' for models
+        generateAngularArtifact('interface', name, `${basePath}/models`);
       });
     }
     if (services.length) {
@@ -116,16 +129,15 @@ Writing down your approach before you start coding helps you clarify your though
     execSync(`git commit -m "Add challenge sample folders, requirements, and generate Angular artifacts for ${branchName}"`, { stdio: 'inherit' });
 
     // Push branch to remote
-    // Delay to ensure commit is registered before push
     setTimeout(() => {
       execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
-
       console.log(`Branch ${branchName} created, artifacts generated, and pushed successfully.`);
     }, 1500);
   } catch (error) {
     console.error(`Error on branch ${branchName}:`, error.message);
   }
 }
+
 
 // Run for all challenges sequentially
 (async () => {

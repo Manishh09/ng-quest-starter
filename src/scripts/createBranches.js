@@ -101,7 +101,7 @@ Writing down your approach before you start coding helps you clarify your though
     }
     if (models.length) {
       models.forEach(name => {
-        generateAngularArtifact('interface', name, `${basePath}/models`); // Angular CLI uses 'interface' for models
+        generateAngularArtifact('interface', `${name}.model`, `${basePath}/models`); // Angular CLI uses 'interface' for models
       });
     }
     if (services.length) {

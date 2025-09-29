@@ -6,7 +6,7 @@ const angularProjectRoot = '.'; // Change if your ng project root is different
 const execOptions = {
   stdio: 'inherit',
   cwd: angularProjectRoot,
-  env: {...process.env, NG_CLI_ANALYTICS: 'ci'} // disables analytics prompt
+  env: { ...process.env, NG_CLI_ANALYTICS: 'false' } // disables analytics prompt
 };
 
 const branchNames = [
@@ -82,6 +82,14 @@ const challenges = {
   // Add more challenge entries here with requirementUrl
 };
 
+// ✅ Ensure analytics is disabled globally before anything else
+try {
+  execSync('ng analytics off', execOptions);
+  console.log('✅ Angular analytics disabled');
+} catch (e) {
+  console.warn('⚠️ Failed to disable Angular analytics (may already be off)');
+}
+
 const baseBranch = 'develop';
 
 // Helper: fetch and decode base64 requirements content from GitHub API
@@ -150,21 +158,15 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
     const approachContent = `# My Approach\nDescribe your approach here.\n\n# Approach for ${branchName}\n\n# Why Write Your Approach First?\nWriting down your approach before you start coding helps you clarify your thoughts, plan your solution, and catch potential issues early. It's a crucial step that increases your problem-solving effectiveness and code quality.`;
     fs.writeFileSync(`${basePath}/MY_APPROACH.md`, approachContent);
 
-    // Generate Angular components, models, services under their respective folders
-    if (components.length) {
-      components.forEach(name => {
-        generateAngularArtifact('component', name, `${basePath}/components`);
-      });
+    // Generate Angular components, models, services
+    for (const name of components) {
+      generateAngularArtifact('component', name, `${basePath}/components`);
     }
-    if (models.length) {
-      models.forEach(name => {
-        generateAngularArtifact('interface', name, `${basePath}/models`);
-      });
+    for (const name of models) {
+      generateAngularArtifact('interface', name, `${basePath}/models`);
     }
-    if (services.length) {
-      services.forEach(name => {
-        generateAngularArtifact('service', name, `${basePath}/services`);
-      });
+    for (const name of services) {
+      generateAngularArtifact('service', name, `${basePath}/services`);
     }
 
     // Stage all changes
@@ -172,20 +174,21 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
     // Commit changes
     execSync(`git commit -m "Add challenge sample folders, requirements, and generate Angular artifacts for ${branchName}"`, { stdio: 'inherit' });
 
-    // Push branch to remote
-    setTimeout(() => {
-      execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
-      console.log(`Branch ${branchName} created, artifacts generated, and pushed successfully.`);
-    }, 1500);
+    // Push branch to remote (synchronously)
+    execSync(`git push -u origin ${branchName}`, { stdio: 'inherit' });
+
+    // Wait before moving to the next challenge
+    await new Promise(r => setTimeout(r, 2000));
+
+    console.log(`✅ Branch ${branchName} created, artifacts generated, and pushed successfully.\n`);
   } catch (error) {
-    console.error(`Error on branch ${branchName}:`, error.message);
+    console.error(`❌ Error on branch ${branchName}:`, error.message);
   }
 }
 
-
-// Run for all challenges sequentially
+// Run challenges one by one
 (async () => {
-  for (const branchName in challenges) {
+  for (const branchName of Object.keys(challenges)) {
     const { components, models, services, requirementUrl } = challenges[branchName];
     await createBranchWithFolders(baseBranch, branchName, components, models, services, requirementUrl);
   }

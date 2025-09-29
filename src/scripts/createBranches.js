@@ -100,6 +100,15 @@ function branchExistsOnRemote(branchName) {
   }
 }
 
+function getNextMissingBranch(challenges) {
+  for (const branchName in challenges) {
+    if (!branchExistsLocally(branchName) && !branchExistsOnRemote(branchName)) {
+      return branchName; // return the first missing branch
+    }
+  }
+  return null; // all exist
+}
+
 
 // ✅ Ensure analytics is disabled globally before anything else
 try {
@@ -214,9 +223,26 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
 }
 
 // Run challenges one by one
+
 (async () => {
-  for (const branchName of Object.keys(challenges)) {
+  let branchName = getNextMissingBranch(challenges);
+
+  while (branchName) {
     const { components, models, services, requirementUrl } = challenges[branchName];
+
     await createBranchWithFolders(baseBranch, branchName, components, models, services, requirementUrl);
+
+    // move to the next missing branch after finishing this one
+    branchName = getNextMissingBranch(challenges);
   }
+
+  console.log("🎉 All missing branches have been created successfully!");
 })();
+
+
+// (async () => {
+//   for (const branchName of Object.keys(challenges)) {
+//     const { components, models, services, requirementUrl } = challenges[branchName];
+//     await createBranchWithFolders(baseBranch, branchName, components, models, services, requirementUrl);
+//   }
+// })();

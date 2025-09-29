@@ -22,39 +22,39 @@ const branchNames = [
 
 // Challenges with file names remain the same
 const challenges = {
-  // 'challenge-01-product-list': {
-  //   components: ['product-list'],
-  //   models: ['product'],
-  //   services: ['product'],
-  //   requirementUrl: `${challengesEndpoint}/challenge-01-product-list/docs/CH-01-REQUIREMENT.md`
-  // },
+  'challenge-01-product-list': {
+    components: ['product-list'],
+    models: ['product'],
+    services: ['product'],
+    requirementUrl: `${challengesEndpoint}/challenge-01-product-list/docs/CH-01-REQUIREMENT.md`
+  },
 
-  // 'challenge-02-parallel-apis': {
-  //   components: ['user-list', 'post-list', 'user-posts-dashboard'],
-  //   models: ['user', 'post'],
-  //   services: ['user', 'post'],
-  //   requirementUrl: `${challengesEndpoint}/challenge-02-parallel-apis/docs/CH-02-REQUIREMENT.md`
-  // },
+  'challenge-02-parallel-apis': {
+    components: ['user-list', 'post-list', 'user-posts-dashboard'],
+    models: ['user', 'post'],
+    services: ['user', 'post'],
+    requirementUrl: `${challengesEndpoint}/challenge-02-parallel-apis/docs/CH-02-REQUIREMENT.md`
+  },
 
-  // 'challenge-03-client-side-search': {
-  //   components: ['user-search'],
-  //   models: ['user'],
-  //   services: ['user'],
-  //   requirementUrl: `${challengesEndpoint}/challenge-03-client-side-search/docs/CH-03-REQUIREMENT.md`
-  // },
-  // 'challenge-04-server-side-search': {
-  //   components: ['user-search'],
-  //   models: ['user'],
-  //   services: ['user'],
-  //   requirementUrl: `${challengesEndpoint}/challenge-04-server-side-search/docs/CH-04-REQUIREMENT.md`
-  // },
+  'challenge-03-client-side-search': {
+    components: ['user-search'],
+    models: ['user'],
+    services: ['user'],
+    requirementUrl: `${challengesEndpoint}/challenge-03-client-side-search/docs/CH-03-REQUIREMENT.md`
+  },
+  'challenge-04-server-side-search': {
+    components: ['user-search'],
+    models: ['user'],
+    services: ['user'],
+    requirementUrl: `${challengesEndpoint}/challenge-04-server-side-search/docs/CH-04-REQUIREMENT.md`
+  },
 
-  // 'challenge-05-product-category-management-system': {
-  //   components: ['category-summary', 'product-filter', 'product-form'],
-  //   models: ['category', 'product'],
-  //   services: ['category', 'product'],
-  //   requirementUrl: `${challengesEndpoint}/challenge-05-product-category-management-system/docs/CH-05-REQUIREMENT.md`
-  // },
+  'challenge-05-product-category-management-system': {
+    components: ['category-summary', 'product-filter', 'product-form'],
+    models: ['category', 'product'],
+    services: ['category', 'product'],
+    requirementUrl: `${challengesEndpoint}/challenge-05-product-category-management-system/docs/CH-05-REQUIREMENT.md`
+  },
 
   'challenge-06-user-todos-filter': {
     components: ['user-list', 'todo-list', 'user-todo-dashboard'],
@@ -81,6 +81,25 @@ const challenges = {
 
   // Add more challenge entries here with requirementUrl
 };
+
+function branchExistsLocally(branchName) {
+  try {
+    execSync(`git rev-parse --verify ${branchName}`, { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function branchExistsOnRemote(branchName) {
+  try {
+    execSync(`git ls-remote --exit-code --heads origin ${branchName}`, { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 
 // ✅ Ensure analytics is disabled globally before anything else
 try {
@@ -132,6 +151,14 @@ function generateAngularArtifact(type, name, relativePath) {
 // Main: create branch, generate files, add requirement
 async function createBranchWithFolders(baseBranch, branchName, components = [], models = [], services = [], requirementUrl = '') {
   try {
+
+     // Skip if branch already exists locally or on remote
+    if (branchExistsLocally(branchName) || branchExistsOnRemote(branchName)) {
+      console.log(`⏩ Skipping ${branchName}, branch already exists.`);
+      return;
+    }
+
+
     // Checkout base branch and create new branch
     execSync(`git checkout ${baseBranch}`, { stdio: 'inherit' });
     execSync(`git checkout -b ${branchName}`, { stdio: 'inherit' });

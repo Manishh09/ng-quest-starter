@@ -167,23 +167,36 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
 
 async function updateRequirementDocs(branchName, requirementUrl) {
   try {
+    // Checkout branch
     execSync(`git checkout ${branchName}`, { stdio: 'inherit' });
-    fs.mkdirSync('src/docs', { recursive: true });
 
+    // Extract filename (e.g. CH-01-REQUIREMENT.md)
     const requirementFileName = requirementUrl.split('/').pop();
+
+    // Fetch requirement content
     const requirementsContent = await getRequirementContent(requirementUrl);
+
+    // Write directly to src/docs (folder already exists in each branch)
     const filePath = `src/docs/${requirementFileName}`;
     fs.writeFileSync(filePath, requirementsContent);
 
+    // Stage + commit + push
     execSync(`git add ${filePath}`, { stdio: 'inherit' });
-    execSync(`git commit -m "🔄 Update ${requirementFileName} from external repo"`, { stdio: 'inherit' });
+    execSync(
+      `git commit -m "🔄 Update ${requirementFileName} from external repo" || echo "⚠️ Nothing to commit"`,
+      { stdio: 'inherit' }
+    );
     execSync(`git push origin ${branchName}`, { stdio: 'inherit' });
-    await new Promise(res => setTimeout(res, 3000)); // brief pause to avoid API rate limits
+
+    // Small pause to avoid API/GitHub push rate limits
+    await new Promise(res => setTimeout(res, 3000));
+
     console.log(`✅ Updated ${requirementFileName} in ${branchName}`);
   } catch (err) {
     console.error(`❌ Failed to update requirements for ${branchName}:`, err.message);
   }
 }
+
 
 // ------------------ Run All ------------------
 

@@ -58,6 +58,12 @@ const challenges = {
     models: ['product', 'payment', 'order'],
     services: ['product', 'order', 'checkout-facade'],
     requirementUrl: `${challengesEndpoint}/challenge-08-ecommerce-checkout/docs/CH-08-REQUIREMENT.md`
+  },
+  'challenge-09-component-communication': {
+    components: ['product-selector', 'product-display', 'product-dashboard'],
+    models: ['product-category'],
+    services: ['product'],
+    requirementUrl: `${challengesEndpoint}/challenge-09-component-communication/docs/CH-09-REQUIREMENT.md`
   }
 };
 
@@ -208,24 +214,24 @@ async function updateRequirementDocs(branchName, requirementUrl) {
     console.warn('⚠️ Failed to disable Angular analytics (may already be off)');
   }
 
-  //const baseBranch = 'develop';
+  const baseBranch = 'develop';
 
   // Create missing branches first
-  // let branchName = getNextMissingBranch(challenges);
-  // while (branchName) {
-  //   const { components, models, services, requirementUrl } = challenges[branchName];
-  //   await createBranchWithFolders(baseBranch, branchName, components, models, services, requirementUrl);
-  //   branchName = getNextMissingBranch(challenges);
-  // }
-
-  // console.log("🎉 All missing branches created.");
-
-  // Update requirement docs for all branches
-  for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
-    if (requirementUrl) {
-      await updateRequirementDocs(branchName, requirementUrl);
-    }
+  let branchName = getNextMissingBranch(challenges);
+  while (branchName) {
+    const { components, models, services, requirementUrl } = challenges[branchName];
+    await createBranchWithFolders(baseBranch, branchName, components, models, services, requirementUrl);
+    branchName = getNextMissingBranch(challenges);
   }
+
+  console.log("🎉 All missing branches created.");
+
+  // // Update requirement docs for all branches
+  // for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
+  //   if (requirementUrl) {
+  //     await updateRequirementDocs(branchName, requirementUrl);
+  //   }
+  // }
 
   console.log("✅ Requirement docs synced for all branches.");
 })();

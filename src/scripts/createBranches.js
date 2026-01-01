@@ -64,7 +64,67 @@ const challenges = {
     models: ['product-category'],
     services: ['product'],
     requirementUrl: `${challengesEndpoint}/challenge-09-component-communication/docs/CH-09-REQUIREMENT.md`
-  }
+  },
+  'challenge-10-authorized-resource-access': {
+    components: ['product-list', 'login'],
+    models: [],
+    services: ['auth'],
+    requirementUrl: `${challengesEndpoint}/challenge-10-authorized-resource-access/docs/CH-10-REQUIREMENT.md`
+  },
+  'challenge-11-admin-dashboard-access': {
+    components: ['admin-dashboard', 'posts', 'users', 'login'],
+    models: [],
+    services: ['auth', 'post', 'user'],
+    requirementUrl: `${challengesEndpoint}/challenge-11-admin-dashboard-access/docs/CH-11-REQUIREMENT.md`
+  },
+  'challenge-12-reactive-login-form': {
+  components: ['login-form'],
+  models: ['login-credentials'],
+  services: [],
+  requirementUrl: `${challengesEndpoint}/challenge-12-reactive-login-form/docs/CH-12-REQUIREMENT.md`
+},
+
+'challenge-13-duplicate-project-name-validator': {
+  components: ['project-form'],
+  models: ['project'],
+  services: ['project'],
+  requirementUrl: `${challengesEndpoint}/challenge-13-duplicate-project-name-validator/docs/CH-13-REQUIREMENT.md`
+},
+
+'challenge-14-email-availability-check': {
+  components: ['email-form'],
+  models: ['email'],
+  services: ['email-validation'],
+  requirementUrl: `${challengesEndpoint}/challenge-14-email-availability-check/docs/CH-14-REQUIREMENT.md`
+},
+
+'challenge-15-date-range-validation': {
+  components: ['leave-form'],
+  models: ['leave-request'],
+  services: [],
+  requirementUrl: `${challengesEndpoint}/challenge-15-date-range-validation/docs/CH-15-REQUIREMENT.md`
+},
+
+'challenge-16-dynamic-form-array': {
+  components: ['experience-form'],
+  models: ['experience'],
+  services: [],
+  requirementUrl: `${challengesEndpoint}/challenge-16-dynamic-form-array/docs/CH-16-REQUIREMENTS.md`
+},
+
+'challenge-17-custom-input-cva': {
+  components: ['custom-input', 'demo-form'],
+  models: ['user-form'],
+  services: [],
+  requirementUrl: `${challengesEndpoint}/challenge-17-custom-input-cva/docs/CH-17-REQUIREMENT.md`
+},
+
+'challenge-18-server-driven-dynamic-form': {
+  components: ['dynamic-form'],
+  models: ['form-schema'],
+  services: ['form-schema'],
+  requirementUrl: `${challengesEndpoint}/challenge-18-server-driven-dynamic-form/docs/CH-18-REQUIREMENT.md`
+}
 };
 
 // ------------------ Helpers ------------------

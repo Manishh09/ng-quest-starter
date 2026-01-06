@@ -265,7 +265,8 @@ async function updateRequirementDocs(branchName, requirementUrl) {
 
     // Fetch requirement content
     const requirementsContent = await getRequirementContent(requirementUrl);
-
+    const docsDir = path.join('src', 'docs');
+    const filePath = path.join(docsDir, requirementFileName);
     // ✅ Ensure src/docs exists
     if (!fs.existsSync(docsDir)) {
       fs.mkdirSync(docsDir, { recursive: true });
@@ -317,7 +318,7 @@ async function updateRequirementDocs(branchName, requirementUrl) {
   /// Update requirement docs for all branches
   for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
     if (requirementUrl) {
-     await updateRequirementDocs(branchName, requirementUrl);
+      await updateRequirementDocs(branchName, requirementUrl);
     }
   }
 

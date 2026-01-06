@@ -11,7 +11,18 @@ const branches = [
   'challenge-05-product-category-management-system',
   'challenge-06-user-todos-filter',
   'challenge-07-dependent-apis',
-  'challenge-08-ecommerce-checkout'
+  'challenge-08-ecommerce-checkout',
+  'challenge-09-component-communication',
+  'challenge-10-authorized-resource-access',
+  'challenge-11-admin-dashboard-access',
+  'challenge-12-reactive-login-form',
+  'challenge-13-duplicate-project-name-validator',
+  'challenge-14-email-availability-check',
+  'challenge-15-date-range-validation',
+  'challenge-16-dynamic-form-array',
+  'challenge-17-custom-input-cva',
+  'challenge-18-server-driven-dynamic-form',
+  'challenge-19-unsaved-form-changes'
 ];
 
 function run(cmd) {

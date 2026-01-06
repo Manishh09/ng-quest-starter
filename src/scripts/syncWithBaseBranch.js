@@ -51,7 +51,7 @@ function run(cmd) {
         run(`git push origin ${branch}`);
 
         // delay for clarity in logs
-        await new Promise((res) => setTimeout(res, 2000));
+        await new Promise((res) => setTimeout(res, 5000));
 
         console.log(`✅ ${branch} synced with ${baseBranch}\n`);
       } catch (err) {

@@ -225,7 +225,7 @@ async function createBranchWithFolders(baseBranch, branchName, components = [], 
 
     // --- Approach doc ---
     const approachContent = `# My Approach\n\n# Approach for ${branchName}\n\nDescribe your thought process here.`;
-    fs.writeFileSync(`${basePath}/MY_APPROACH.md`, approachContent);
+    fs.writeFileSync(`${basePath}/MY_IMPLEMENTATION_PLAN.md`, approachContent);
 
     for (const name of components) generateAngularArtifact('component', name, `${basePath}/components`);
     for (const name of models) generateAngularArtifact('interface', name, `${basePath}/models`);
@@ -298,12 +298,12 @@ async function updateRequirementDocs(branchName, requirementUrl) {
 
   console.log("🎉 All missing branches created.");
 
-  // // Update requirement docs for all branches
-  // for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
-  //   if (requirementUrl) {
-  //     await updateRequirementDocs(branchName, requirementUrl);
-  //   }
-  // }
+  // Update requirement docs for all branches
+  for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
+    if (requirementUrl) {
+      await updateRequirementDocs(branchName, requirementUrl);
+    }
+  }
 
   console.log("✅ Requirement docs synced for all branches.");
 })();

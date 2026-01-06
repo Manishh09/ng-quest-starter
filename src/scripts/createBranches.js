@@ -179,12 +179,15 @@ function getNextMissingBranch(challenges) {
 
 async function getRequirementContent(url) {
   const response = await fetch(url);
-  if (!response.ok) throw new Error(`Failed to fetch requirement from ${url}`);
-  const json = await response.json();
-  if (!json.content) throw new Error('API response missing content field');
-  const buff = Buffer.from(json.content, 'base64');
-  return buff.toString('utf-8');
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch requirement from ${url}`);
+  }
+
+  // IMPORTANT: markdown is plain text
+  return await response.text();
 }
+
 
 function generateAngularArtifact(type, name, relativePath) {
   try {
@@ -276,7 +279,7 @@ async function updateRequirementDocs(branchName, requirementUrl) {
     execSync(`git push origin ${branchName}`, { stdio: 'inherit' });
 
     // Small pause to avoid API/GitHub push rate limits
-    await new Promise(res => setTimeout(res, 3000));
+    await new Promise(res => setTimeout(res, 5000));
 
     console.log(`✅ Updated ${requirementFileName} in ${branchName}`);
   } catch (err) {
@@ -310,7 +313,7 @@ async function updateRequirementDocs(branchName, requirementUrl) {
   // Update requirement docs for all branches
   for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
     if (requirementUrl) {
-      await updateRequirementDocs(branchName, requirementUrl);
+     await updateRequirementDocs(branchName, requirementUrl);
     }
   }
 

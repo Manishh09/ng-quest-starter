@@ -8,12 +8,11 @@ const categoryNames = {
   CORE: 'ngc-core'
 };
 const BRANCH = 'develop';
-
 const challengesEndpoint = (
   category,
   challengeId,
   filePath
-) => `https://api.github.com/repos/Manishh09/ng-coding-challenges/contents/projects/${category}/src/app/challenges/${challengeId}/${filePath}?ref=${BRANCH}`;
+) => `https://raw.githubusercontent.com/Manishh09/ng-coding-challenges/${BRANCH}/projects/${category}/src/app/challenges/${challengeId}/${filePath}`;
 
 const angularProjectRoot = '.'; // Change if ng project root is different
 const execOptions = {

@@ -7,7 +7,7 @@ const categoryNames = {
   ROUTING: 'ngc-routing',
   CORE: 'ngc-core'
 };
-const challengesEndpoint = (category) => `https://api.github.com/repositories/1014427702/contents/projects/${category}/src/app/challenges`;
+const challengesEndpoint = (category) => `https://api.github.com/repos/Manishh09/ng-coding-challenges/contents/projects/${category}/src/app/challenges?ref=develop`;
 
 const angularProjectRoot = '.'; // Change if ng project root is different
 const execOptions = {

@@ -1,7 +1,7 @@
+const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
-const { S } = require('@angular/cdk/keycodes');
-const categoryNames = {
+ const categoryNames = {
   RXJS_API: 'ngc-rxjs-api',
   FORMS: 'ngc-forms',
   ROUTING: 'ngc-routing',

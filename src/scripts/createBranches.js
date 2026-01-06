@@ -145,7 +145,7 @@ const challenges = {
     components: ['user-profile-form'],
     models: ['user'],
     services: ['user'],
-    requirementUrl: `${challengesEndpoint(categoryNames.FORMS, 'challenge-19-unsaved-form-changes', 'docs/CH-19-REQUIREMENT.md')}`
+    requirementUrl: `${challengesEndpoint(categoryNames.ROUTING, 'challenge-19-unsaved-form-changes', 'docs/CH-19-REQUIREMENT.md')}`
   }
 };
 

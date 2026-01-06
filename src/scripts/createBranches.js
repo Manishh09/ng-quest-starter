@@ -266,8 +266,12 @@ async function updateRequirementDocs(branchName, requirementUrl) {
     // Fetch requirement content
     const requirementsContent = await getRequirementContent(requirementUrl);
 
-    // Write directly to src/docs (folder already exists in each branch)
-    const filePath = `src/docs/${requirementFileName}`;
+    // ✅ Ensure src/docs exists
+    if (!fs.existsSync(docsDir)) {
+      fs.mkdirSync(docsDir, { recursive: true });
+    }
+
+    // ✅ Write markdown file
     fs.writeFileSync(filePath, requirementsContent);
 
     // Stage + commit + push

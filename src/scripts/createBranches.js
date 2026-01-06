@@ -311,11 +311,11 @@ async function updateRequirementDocs(branchName, requirementUrl) {
   console.log("🎉 All missing branches created.");
 
   // Update requirement docs for all branches
-  for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
-    if (requirementUrl) {
-     await updateRequirementDocs(branchName, requirementUrl);
-    }
-  }
+  // for (const [branchName, { requirementUrl }] of Object.entries(challenges)) {
+  //   if (requirementUrl) {
+  //    await updateRequirementDocs(branchName, requirementUrl);
+  //   }
+  // }
 
   console.log("✅ Requirement docs synced for all branches.");
 })();
